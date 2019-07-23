@@ -1,0 +1,61 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/casper/kode/fsharp/testing/parsec/parsec.fsproj": {}
+  },
+  "projects": {
+    "/home/casper/kode/fsharp/testing/parsec/parsec.fsproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/casper/kode/fsharp/testing/parsec/parsec.fsproj",
+        "projectName": "parsec",
+        "projectPath": "/home/casper/kode/fsharp/testing/parsec/parsec.fsproj",
+        "packagesPath": "/home/casper/.nuget/packages/",
+        "outputPath": "/home/casper/kode/fsharp/testing/parsec/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/home/casper/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp2.2"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp2.2": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "netcoreapp2.2": {
+          "dependencies": {
+            "FParsec": {
+              "target": "Package",
+              "version": "[1.0.3, )"
+            },
+            "FSharp.Core": {
+              "target": "Package",
+              "version": "[4.6.2, )"
+            },
+            "Microsoft.NETCore.App": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.2.0, )",
+              "autoReferenced": true
+            }
+          },
+          "imports": [
+            "net461"
+          ],
+          "assetTargetFallback": true,
+          "warn": true
+        }
+      }
+    }
+  }
+}

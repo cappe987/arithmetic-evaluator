@@ -1,0 +1,10 @@
+/home/casper/kode/fsharp/testing/parsec/bin/Debug/netcoreapp2.2/parsec.deps.json
+/home/casper/kode/fsharp/testing/parsec/bin/Debug/netcoreapp2.2/parsec.runtimeconfig.json
+/home/casper/kode/fsharp/testing/parsec/bin/Debug/netcoreapp2.2/parsec.runtimeconfig.dev.json
+/home/casper/kode/fsharp/testing/parsec/bin/Debug/netcoreapp2.2/parsec.dll
+/home/casper/kode/fsharp/testing/parsec/bin/Debug/netcoreapp2.2/parsec.pdb
+/home/casper/kode/fsharp/testing/parsec/obj/Debug/netcoreapp2.2/parsec.fsprojAssemblyReference.cache
+/home/casper/kode/fsharp/testing/parsec/obj/Debug/netcoreapp2.2/parsec.AssemblyInfoInputs.cache
+/home/casper/kode/fsharp/testing/parsec/obj/Debug/netcoreapp2.2/parsec.AssemblyInfo.fs
+/home/casper/kode/fsharp/testing/parsec/obj/Debug/netcoreapp2.2/parsec.dll
+/home/casper/kode/fsharp/testing/parsec/obj/Debug/netcoreapp2.2/parsec.pdb
