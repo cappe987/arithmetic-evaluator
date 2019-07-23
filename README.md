@@ -13,10 +13,10 @@ FParsec
 # How-to
 ## dotnet-core
 ```
-dotnet add package FParsec --version 1.0.3
+cd bin/Debug/netcoreapp2.2
 ```
 ```
-dotnet run
+dotnet parsec.dll
 ```
 ## Mono
 ```
@@ -25,4 +25,9 @@ sudo gacutil -i DLLs/FParsecCS.dll
 ```
 ```
 mono Program.exe
+```
+
+# Installing FParsec
+```
+dotnet add package FParsec --version 1.0.3
 ```
