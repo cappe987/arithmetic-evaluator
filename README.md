@@ -7,4 +7,22 @@ Currently does not handle negative numbers as input.
 +, -, *, /, **, %
 
 # Dependencies
+dotnet-core
 FParsec
+
+# How-to
+## dotnet-core
+```
+dotnet add package FParsec --version 1.0.3
+```
+```
+dotnet run
+```
+## Mono
+```
+sudo gacutil -i DLLs/FParsec.dll
+sudo gacutil -i DLLs/FParsecCS.dll
+```
+```
+mono Program.exe
+```
