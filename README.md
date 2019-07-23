@@ -5,3 +5,6 @@ Currently does not handle negative numbers as input.
 
 # Operators
 +, -, *, /, **, %
+
+# Dependencies
+FParsec
