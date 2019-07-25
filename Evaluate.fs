@@ -5,49 +5,60 @@ open Expression
 
 
 
+// Construct expression tree from postfix
 let rec buildTree stack = 
   function 
   | []                 -> 
     match stack with
-    | x::[] -> x
-    | _ -> failwith "Error @ buildTree"
+    | x::[] -> Some x
+    | _ -> None 
 
   | Operand  x::stream -> 
     buildTree (Leaf (Operand x)::stack) stream
 
   | Operator x::stream -> 
     match stack with
-    | []         -> emptyTree //
-    | _::[]      -> failwith "Error @ buildTree | Invalid operator to operand ratio"
+    | []         -> None 
+    | _::[]      -> None 
     | r::l::stack -> 
       let node = root l (Operator x) r
       buildTree (node::stack) stream
 
 
+
+let bind2 f x y = 
+  match x with
+  | Some x -> 
+    match y with
+    | Some y -> Some (f x y)
+    | None -> None
+  | None -> None
+
+
+
 let getOp =
   function
-  | "+"  -> (+)
-  | "-"  -> (-)
-  | "/"  -> (/)
-  | "*"  -> (*)
-  | "%"  -> fun x y -> x%y
-  | "**" -> fun x y -> x**y
-  | _    -> failwith "Non-supported operator"
+  | Addition       -> bind2 (+)
+  | Subtraction    -> bind2 (-)
+  | Multiplication -> bind2 (*)
+  | Division       -> bind2 (/)
+  | Remainder      -> bind2 (fun x y -> x%y)
+  | Exponent       -> bind2 (fun x y -> x**y)
+
 
 let rec eval = 
   function
   | Leaf v -> 
     match v with
-    | Operator x   -> failwith "Error @ eval | Operator can't be leaf"
-    | Operand  v   -> v
+    | Operand x  -> Some x
+    | Operator _ -> None
 
   | Node (v, l, r) -> 
-    match v with
-    | Operand  v -> failwith "Error @ eval | Found value, expected operator"
-    | Operator x ->
-      let f = getOp x
+    match v with 
+    | Operand _   -> None
+    | Operator op -> 
+      let f = getOp op
       f (eval l) (eval r)
 
-  | Empty -> failwith "Error @ eval | Expected something, got nothing"
-
+  | Empty -> None 
 

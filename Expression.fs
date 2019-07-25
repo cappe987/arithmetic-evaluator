@@ -1,19 +1,42 @@
 module Expression
 
-open Tree
 open FParsec
 
+
+type Operator = 
+  | Addition
+  | Subtraction
+  | Multiplication
+  | Division
+  | Remainder
+  | Exponent
+
 type Token = 
-  | Operator of string
+  | Operator of Operator
   | Operand  of float
 
 
-let pOperand : Parser<Token, unit>  = 
+let createOperator s = 
+  let inner = 
+    function
+    | "+"  -> Addition
+    | "-"  -> Subtraction
+    | "*"  -> Multiplication
+    | "/"  -> Division
+    | "%"  -> Remainder
+    | "**" -> Exponent
+    | _    -> failwith "Non-supported operator | Should not occur"
+  
+  Operator (inner s)
+
+
+
+let pOperand =
   pfloat |>> Operand 
 
-let pOperator : Parser<Token, unit> = 
+let pOperator =
   let op = choice (List.map (fun s -> pstring s) ["**"; "+"; "-"; "/"; "*"; "%"])
-  op |>> Operator
+  op |>> createOperator
 
 let exprParser : Parser<Token list, unit> = 
   many1 (pOperator <|> pOperand)
@@ -24,19 +47,18 @@ let exprParser : Parser<Token list, unit> =
 
 let leftAssociative = 
   function
-  | "**" -> false
+  | Exponent -> false
   | _    -> true
 
 
 let precedence = 
   function
-  | "+"  -> 2
-  | "-"  -> 2
-  | "/"  -> 3
-  | "*"  -> 3
-  | "%"  -> 3
-  | "**" -> 4
-  | _    -> failwith "Non-supported operator"
+  | Addition       -> 2
+  | Subtraction    -> 2
+  | Multiplication -> 3
+  | Division       -> 3
+  | Remainder      -> 3
+  | Exponent       -> 4
 
 
 let shouldPopStack top x =  
@@ -45,12 +67,12 @@ let shouldPopStack top x =
   if px < ptop then
     true
   elif px = ptop then
-    if leftAssociative top then true
-    else false
+    leftAssociative top
   else
     false
 
 
+// Pop to output according to algorithm
 let rec popWhile x acc = 
   function
   | []    -> (List.rev acc, [])
@@ -63,9 +85,9 @@ let rec popWhile x acc =
 
 let liftOp xs = List.map Operator xs
 
-let rec shuntingYard (stack : string list)= 
+let rec shuntingYard stack = 
   function
-  | []    -> liftOp stack
+  | []    -> liftOp stack // Retrieve the remaining operators
   | x::xs -> 
     match x with
     | Operand  x -> 
