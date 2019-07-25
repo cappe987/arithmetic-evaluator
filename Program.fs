@@ -43,10 +43,9 @@ let rec repl() =
 
 [<EntryPoint>]
 let main argv =
-  try
+  if Array.length argv > 0 then
     printResult (evalExpression argv.[0])
-  with
-  | :? IndexOutOfRangeException ->
+  else
     printfn "-- Arithmetic expression evaluator --"
     printfn "--       Enter \"q\" to exit       --"
     repl()
