@@ -61,7 +61,7 @@ let precedence =
   | Exponent       -> 4
 
 
-let shouldPopStack top x =  
+let shouldPopStack x top =  
   let px   = precedence x
   let ptop = precedence top
   if px < ptop then
@@ -71,17 +71,6 @@ let shouldPopStack top x =
   else
     false
 
-
-// Pop to output according to algorithm
-let rec popWhile x acc = 
-  function
-  | []    -> (List.rev acc, [])
-  | top::xs -> 
-    if shouldPopStack top x then
-      popWhile x (top::acc) xs
-    else
-      (List.rev acc, top::xs)
-  
 
 let liftOp xs = List.map Operator xs
 
@@ -93,7 +82,8 @@ let rec shuntingYard stack =
     | Operand  x -> 
       (Operand x) :: shuntingYard stack xs
     | Operator x ->
-      let (popped, stack) = popWhile x [] stack
+      let popped = List.takeWhile (shouldPopStack x) stack
+      let stack  = List.skipWhile (shouldPopStack x) stack
       (liftOp popped) @ shuntingYard (x::stack) xs
 
 
