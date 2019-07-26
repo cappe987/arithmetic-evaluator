@@ -10,24 +10,24 @@ open Evaluate
 
 let evalExpression input = 
   match run exprParser input with
-  | Failure (str, err, state) -> None
-  | Success (v, _, _)         -> 
+  | Failure (_, _, _) -> None
+  | Success (v, _, _) -> 
     v
     |> shuntingYard []
-    |> buildTree []
-    |> function 
-      | Some tree -> eval tree
-      | None -> None
+    |> evaluate []
+    // |> function 
+    //   | Some tree -> eval tree
+    //   | None -> None
 
 
-let printResult : float option -> unit= 
+let printResult : float option -> unit = 
   function
   | None   -> printfn "Failed evaluating expression"
   | Some v -> 
     if v = Math.Round(v) then
-      printfn "%A" (int v)
+      printfn "%d" (int v)
     else
-      printfn "%A" v
+      printfn "%f" v
 
 
 let rec repl() = 

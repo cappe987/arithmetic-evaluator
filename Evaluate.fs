@@ -1,12 +1,26 @@
 module Evaluate
 
-open Tree
+// open Tree
 open Expression
 
 
+let getOp =
+  function
+  | Addition       -> (+)
+  | Subtraction    -> (-)
+  | Multiplication -> (*)
+  | Division       -> (/)
+  | Remainder      -> (fun x y -> x%y)
+  | Exponent       -> (fun x y -> x**y)
 
-// Construct expression tree from postfix
-let rec buildTree stack = 
+
+let evalSingle op left right= 
+  let f = getOp op
+  f left right
+
+// Evaluate postfix expression
+// Same algorithm as building a tree from postfix, but evaluated immediately
+let rec evaluate stack = 
   function 
   | []                 -> 
     match stack with
@@ -14,51 +28,42 @@ let rec buildTree stack =
     | _ -> None 
 
   | Operand  x::stream -> 
-    buildTree (Leaf (Operand x)::stack) stream
+    evaluate (x::stack) stream
 
   | Operator x::stream -> 
     match stack with
-    | []         -> None 
-    | _::[]      -> None 
     | r::l::stack -> 
-      let node = root l (Operator x) r
-      buildTree (node::stack) stream
+      let value = evalSingle x l r
+      evaluate (value::stack) stream
+
+    | _ -> None
 
 
 
-let bind2 f x y = 
-  match x with
-  | Some x -> 
-    match y with
-    | Some y -> Some (f x y)
-    | None -> None
-  | None -> None
 
 
 
-let getOp =
-  function
-  | Addition       -> bind2 (+)
-  | Subtraction    -> bind2 (-)
-  | Multiplication -> bind2 (*)
-  | Division       -> bind2 (/)
-  | Remainder      -> bind2 (fun x y -> x%y)
-  | Exponent       -> bind2 (fun x y -> x**y)
+// let bind2 f x y = 
+//   match x with
+//   | Some x -> 
+//     match y with
+//     | Some y -> Some (f x y)
+//     | None -> None
+//   | None -> None
 
+// let rec eval = 
+//   function
+//   | Leaf v -> 
+//     match v with
+//     | Operand x  -> Some x
+//     | Operator _ -> None
 
-let rec eval = 
-  function
-  | Leaf v -> 
-    match v with
-    | Operand x  -> Some x
-    | Operator _ -> None
+//   | Node (v, l, r) -> 
+//     match v with 
+//     | Operand _   -> None
+//     | Operator op -> 
+//       let f = getOp op
+//       f (eval l) (eval r)
 
-  | Node (v, l, r) -> 
-    match v with 
-    | Operand _   -> None
-    | Operator op -> 
-      let f = getOp op
-      f (eval l) (eval r)
-
-  | Empty -> None 
+//   | Empty -> None 
 
