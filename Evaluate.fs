@@ -1,10 +1,9 @@
 module Evaluate
 
-// open Tree
 open Expression
 
 
-let getOp =
+let getOperation =
   function
   | Addition       -> (+)
   | Subtraction    -> (-)
@@ -12,10 +11,12 @@ let getOp =
   | Division       -> (/)
   | Remainder      -> (fun x y -> x%y)
   | Exponent       -> (fun x y -> x**y)
+  | LeftParens     -> failwith "Left not popped"
+  | RightParens    -> failwith "Right not popped"
 
 
 let evalSingle op left right= 
-  let f = getOp op
+  let f = getOperation op
   f left right
 
 // Evaluate postfix expression
@@ -62,7 +63,7 @@ let rec evaluate stack =
 //     match v with 
 //     | Operand _   -> None
 //     | Operator op -> 
-//       let f = getOp op
+//       let f = getOperation op
 //       f (eval l) (eval r)
 
 //   | Empty -> None 

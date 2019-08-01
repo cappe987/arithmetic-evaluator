@@ -14,7 +14,14 @@ let evalExpression input =
   | Success (v, _, _) -> 
     v
     |> shuntingYard []
-    |> evaluate []
+    |> function
+      | None    -> None
+      | Some xs -> 
+        evaluate [] xs
+    
+    // let x = shuntingYard [] v
+    // printfn "%A" x
+    // evaluate [] x
     // |> function 
     //   | Some tree -> eval tree
     //   | None -> None

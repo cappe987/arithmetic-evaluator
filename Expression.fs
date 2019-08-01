@@ -1,6 +1,7 @@
 module Expression
 
 open FParsec
+open Utils
 
 
 type Operator = 
@@ -10,6 +11,9 @@ type Operator =
   | Division
   | Remainder
   | Exponent
+  | LeftParens
+  | RightParens
+
 
 type Token = 
   | Operator of Operator
@@ -25,6 +29,8 @@ let createOperator s =
     | "/"  -> Division
     | "%"  -> Remainder
     | "**" -> Exponent
+    | "("  -> LeftParens
+    | ")"  -> RightParens
     | _    -> failwith "Non-supported operator | Should not occur"
   
   Operator (inner s)
@@ -35,7 +41,9 @@ let pOperand =
   pfloat |>> Operand 
 
 let pOperator =
-  let op = choice (List.map (fun s -> pstring s) ["**"; "+"; "-"; "/"; "*"; "%"])
+  let op = 
+    choice (List.map (fun s -> pstring s) ["**"; "+"; "-"; "/"; "*"; "%"; "("; ")"])
+
   op |>> createOperator
 
 let exprParser : Parser<Token list, unit> = 
@@ -59,6 +67,8 @@ let precedence =
   | Division       -> 3
   | Remainder      -> 3
   | Exponent       -> 4
+  | LeftParens     -> 1
+  | RightParens    -> 1 // Should never appear
 
 
 let shouldPopStack x top =  
@@ -72,19 +82,30 @@ let shouldPopStack x top =
     false
 
 
-let liftOp xs = List.map Operator xs
+let toToken xs = Some (List.map Operator xs)
+
 
 let rec shuntingYard stack = 
   function
-  | []    -> liftOp stack // Retrieve the remaining operators
+  | []    -> toToken stack // Retrieve the remaining operators
   | x::xs -> 
     match x with
-    | Operand  x -> 
-      (Operand x) :: shuntingYard stack xs
-    | Operator x ->
+    | Operand  x            -> 
+      Some ([Operand x]) |@| (shuntingYard stack xs)
+
+    | Operator RightParens  -> 
+      let popped = List.takeWhile (fun t -> t <> LeftParens) stack
+      let stack  = List.skipWhile (fun t -> t <> LeftParens) stack
+      match stack with 
+      | []    -> None // No left parenthesis found
+      | _::stack ->   // Remove the left from stack
+      (toToken popped) |@| shuntingYard (stack) xs
+
+    | Operator LeftParens   ->
+      shuntingYard (LeftParens::stack) xs
+
+    | Operator x            -> 
       let popped = List.takeWhile (shouldPopStack x) stack
       let stack  = List.skipWhile (shouldPopStack x) stack
-      (liftOp popped) @ shuntingYard (x::stack) xs
-
-
+      (toToken popped) |@| shuntingYard (x::stack) xs
 
