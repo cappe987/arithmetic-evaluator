@@ -21,23 +21,26 @@ let evalSingle op left right=
 
 // Evaluate postfix expression
 // Same algorithm as building a tree from postfix, but evaluated immediately
-let rec evaluate stack = 
-  function 
-  | []                 -> 
-    match stack with
-    | x::[] -> Some x
-    | _ -> None 
+let evaluate tokens = 
+  let rec eval stack = 
+    function 
+    | []                 -> 
+      match stack with
+      | x::[] -> Some x
+      | _ -> None 
 
-  | Operand  x::stream -> 
-    evaluate (x::stack) stream
+    | Operand  x::stream -> 
+      eval (x::stack) stream
 
-  | Operator x::stream -> 
-    match stack with
-    | r::l::stack -> 
-      let value = evalSingle x l r
-      evaluate (value::stack) stream
+    | Operator x::stream -> 
+      match stack with
+      | r::l::stack -> 
+        let value = evalSingle x l r
+        eval (value::stack) stream
 
-    | _ -> None
+      | _ -> None
+    
+  eval [] tokens
 
 
 

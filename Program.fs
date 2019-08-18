@@ -12,12 +12,7 @@ let evalExpression input =
   match run exprParser input with
   | Failure (_, _, _) -> None
   | Success (v, _, _) -> 
-    v
-    |> toPostfix
-    |> function
-      | None    -> None
-      | Some xs -> 
-        evaluate [] xs
+    v |> toPostfix >>= evaluate
     
 
 let printResult : float option -> unit = 

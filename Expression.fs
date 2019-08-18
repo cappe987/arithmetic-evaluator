@@ -85,6 +85,10 @@ let shouldPopStack x top =
 let toToken xs = List.map Operator xs
 
 
+//    acc <-----<- input
+//      ^         /
+//       \       v
+//        opstack
 type ShuntingYard = {
   acc     : Token list
   opstack : Operator list
@@ -104,18 +108,18 @@ let popRightParens yard =
 let shunting yard = 
   function
   | Operand  x           -> 
-    Some ({yard with acc=yard.acc @ [Operand x]})
+    Some {yard with acc=yard.acc @ [Operand x]}
 
   | Operator RightParens -> 
     popRightParens yard
 
   | Operator LeftParens  ->
-    Some ({yard with opstack=LeftParens::yard.opstack})
+    Some {yard with opstack=LeftParens::yard.opstack}
 
   | Operator x           -> 
     let popped = List.takeWhile (shouldPopStack x) yard.opstack
     let stack  = List.skipWhile (shouldPopStack x) yard.opstack
-    Some ({yard with acc=yard.acc @ toToken popped; opstack=x::stack})
+    Some {yard with acc=yard.acc @ toToken popped; opstack=x::stack}
 
 
 let ( >>= ) a f = Option.bind f a
@@ -125,6 +129,7 @@ let toPostfix input =
     match yard.input with
     | [] -> Some (yard.acc @ toToken yard.opstack) 
     | x::xs -> 
-      shunting {yard with input=xs} x >>= (fun yard -> go yard)
+      let yard = {yard with input=xs}
+      shunting yard x >>= (fun yard -> go yard)
 
   go {acc=[]; opstack=[]; input=input}
