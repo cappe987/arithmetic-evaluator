@@ -85,47 +85,46 @@ let shouldPopStack x top =
 let toToken xs = List.map Operator xs
 
 
-// type Shunting = {
-//   acc    : Token list
-//   stack  : Operator list
-//   tokens : Token list
-// }
+type ShuntingYard = {
+  acc     : Token list
+  opstack : Operator list
+  input  : Token list
+}
 
 
-let popRightParens stack = 
-  let popped = List.takeWhile (fun t -> t <> LeftParens) stack
-  let stack  = List.skipWhile (fun t -> t <> LeftParens) stack
+let popRightParens yard = 
+  let popped = List.takeWhile (fun t -> t <> LeftParens) yard.opstack
+  let stack  = List.skipWhile (fun t -> t <> LeftParens) yard.opstack
   match stack with 
   | []    -> None // No left parenthesis found
   | _::stack ->   // Remove the left from stack
-  Some (toToken popped, stack)
+  Some ({yard with acc=yard.acc @ toToken popped; opstack=stack})
 
 
-let shuntingYard stack = 
+let shunting yard = 
   function
   | Operand  x           -> 
-    Some ([Operand x], stack) 
+    Some ({yard with acc=yard.acc @ [Operand x]})
 
   | Operator RightParens -> 
-    popRightParens stack
+    popRightParens yard
 
   | Operator LeftParens  ->
-    Some ([], LeftParens::stack)
+    Some ({yard with opstack=LeftParens::yard.opstack})
 
   | Operator x           -> 
-    let popped = List.takeWhile (shouldPopStack x) stack
-    let stack  = List.skipWhile (shouldPopStack x) stack
-    Some (toToken popped, x::stack)
+    let popped = List.takeWhile (shouldPopStack x) yard.opstack
+    let stack  = List.skipWhile (shouldPopStack x) yard.opstack
+    Some ({yard with acc=yard.acc @ toToken popped; opstack=x::stack})
 
 
-let toPostfix tokens = 
-  let rec go acc stack = 
-    function
-    | [] -> Some (acc @ toToken stack)
+let ( >>= ) a f = Option.bind f a
+
+let toPostfix input = 
+  let rec go yard = 
+    match yard.input with
+    | [] -> Some (yard.acc @ toToken yard.opstack) 
     | x::xs -> 
-      match shuntingYard stack x with
-      | None -> None
-      | Some (popped, stack) -> 
-        go (acc @ popped) stack xs 
+      shunting {yard with input=xs} x >>= (fun yard -> go yard)
 
-  go [] [] tokens
+  go {acc=[]; opstack=[]; input=input}
