@@ -19,6 +19,15 @@ type Token =
   | Operator of Operator
   | Operand  of float
 
+//    acc <-----<- input
+//      ^         /
+//       \       v
+//        opstack
+type ShuntingYard = {
+  acc     : Token list
+  opstack : Operator list
+  input   : Token list
+}
 
 let createOperator s = 
   let inner = 
@@ -85,24 +94,13 @@ let shouldPopStack x top =
 let toToken xs = List.map Operator xs
 
 
-//    acc <-----<- input
-//      ^         /
-//       \       v
-//        opstack
-type ShuntingYard = {
-  acc     : Token list
-  opstack : Operator list
-  input  : Token list
-}
-
-
 let popRightParens yard = 
-  let popped = List.takeWhile (fun t -> t <> LeftParens) yard.opstack
-  let stack  = List.skipWhile (fun t -> t <> LeftParens) yard.opstack
+  let popped = List.takeWhile ((<>) LeftParens) yard.opstack
+  let stack  = List.skipWhile ((<>) LeftParens) yard.opstack
   match stack with 
   | []    -> None // No left parenthesis found
   | _::stack ->   // Remove the left from stack
-  Some ({yard with acc=yard.acc @ toToken popped; opstack=stack})
+  Some {yard with acc=yard.acc @ toToken popped; opstack=stack}
 
 
 let shunting yard = 
@@ -130,6 +128,6 @@ let toPostfix input =
     | [] -> Some (yard.acc @ toToken yard.opstack) 
     | x::xs -> 
       let yard = {yard with input=xs}
-      shunting yard x >>= (fun yard -> go yard)
+      shunting yard x >>= go
 
   go {acc=[]; opstack=[]; input=input}
