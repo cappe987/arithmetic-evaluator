@@ -13,25 +13,18 @@ let evalExpression input =
   | Failure (_, _, _) -> None
   | Success (v, _, _) -> 
     v
-    |> shuntingYard []
+    |> toPostfix
     |> function
       | None    -> None
       | Some xs -> 
         evaluate [] xs
     
-    // let x = shuntingYard [] v
-    // printfn "%A" x
-    // evaluate [] x
-    // |> function 
-    //   | Some tree -> eval tree
-    //   | None -> None
-
 
 let printResult : float option -> unit = 
   function
   | None   -> printfn "Failed evaluating expression"
   | Some v -> 
-    if v = Math.Round(v) then
+    if v = Math.Round v then
       printfn "%d" (int v)
     else
       printfn "%f" v

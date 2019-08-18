@@ -82,30 +82,50 @@ let shouldPopStack x top =
     false
 
 
-let toToken xs = Some (List.map Operator xs)
+let toToken xs = List.map Operator xs
 
 
-let rec shuntingYard stack = 
+// type Shunting = {
+//   acc    : Token list
+//   stack  : Operator list
+//   tokens : Token list
+// }
+
+
+let popRightParens stack = 
+  let popped = List.takeWhile (fun t -> t <> LeftParens) stack
+  let stack  = List.skipWhile (fun t -> t <> LeftParens) stack
+  match stack with 
+  | []    -> None // No left parenthesis found
+  | _::stack ->   // Remove the left from stack
+  Some (toToken popped, stack)
+
+
+let shuntingYard stack = 
   function
-  | []    -> toToken stack // Retrieve the remaining operators
-  | x::xs -> 
-    match x with
-    | Operand  x            -> 
-      Some ([Operand x]) |@| (shuntingYard stack xs)
+  | Operand  x           -> 
+    Some ([Operand x], stack) 
 
-    | Operator RightParens  -> 
-      let popped = List.takeWhile (fun t -> t <> LeftParens) stack
-      let stack  = List.skipWhile (fun t -> t <> LeftParens) stack
-      match stack with 
-      | []    -> None // No left parenthesis found
-      | _::stack ->   // Remove the left from stack
-      (toToken popped) |@| shuntingYard (stack) xs
+  | Operator RightParens -> 
+    popRightParens stack
 
-    | Operator LeftParens   ->
-      shuntingYard (LeftParens::stack) xs
+  | Operator LeftParens  ->
+    Some ([], LeftParens::stack)
 
-    | Operator x            -> 
-      let popped = List.takeWhile (shouldPopStack x) stack
-      let stack  = List.skipWhile (shouldPopStack x) stack
-      (toToken popped) |@| shuntingYard (x::stack) xs
+  | Operator x           -> 
+    let popped = List.takeWhile (shouldPopStack x) stack
+    let stack  = List.skipWhile (shouldPopStack x) stack
+    Some (toToken popped, x::stack)
 
+
+let toPostfix tokens = 
+  let rec go acc stack = 
+    function
+    | [] -> Some (acc @ toToken stack)
+    | x::xs -> 
+      match shuntingYard stack x with
+      | None -> None
+      | Some (popped, stack) -> 
+        go (acc @ popped) stack xs 
+
+  go [] [] tokens
