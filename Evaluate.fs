@@ -41,33 +41,3 @@ let evaluate tokens =
       | _ -> None
     
   eval [] tokens
-
-
-
-
-
-
-// let bind2 f x y = 
-//   match x with
-//   | Some x -> 
-//     match y with
-//     | Some y -> Some (f x y)
-//     | None -> None
-//   | None -> None
-
-// let rec eval = 
-//   function
-//   | Leaf v -> 
-//     match v with
-//     | Operand x  -> Some x
-//     | Operator _ -> None
-
-//   | Node (v, l, r) -> 
-//     match v with 
-//     | Operand _   -> None
-//     | Operator op -> 
-//       let f = getOperation op
-//       f (eval l) (eval r)
-
-//   | Empty -> None 
-
